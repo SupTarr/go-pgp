@@ -22,6 +22,12 @@ This project provides a set of Go utilities for performing PGP encryption and de
 
 * [github.com/ProtonMail/gopenpgp/v3](https://github.com/ProtonMail/gopenpgp)
 
+```bash
+go mod tidy
+# or
+go get github.com/ProtonMail/gopenpgp/v3/crypto
+```
+
 ## Setup
 
 1. **Clone the repository (if applicable) or ensure you have the project files.**
