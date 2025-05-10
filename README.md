@@ -10,7 +10,7 @@ This project provides a set of Go utilities for performing PGP encryption and de
   * Decrypt files using a private PGP key from a keyring (without a passphrase if the key is not encrypted).
 * **File Utilities**:
   * Write content to text files.
-  * Write data to CSV files with a custom delimiter.
+  * Write data to CSV files.
   * Create ZIP archives from a list of files.
 
 ## Prerequisites
