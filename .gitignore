@@ -1,0 +1,8 @@
+.DS_Store
+*.pgp
+decrypted
+encrypted
+mock
+private.txt
+secret.asc
+mock.go
