@@ -6,19 +6,19 @@ import (
 )
 
 func main() {
-	err := pgp.Encrypt("public.pgp", "decrypted/006_Merchant_Report_20250429_1.txt", "006_Merchant_Report_20250429_1.txt.pgp")
+	err := pgp.Encrypt("public.pgp", "decrypted/test.txt", "test.txt.pgp")
 	if err != nil {
 		fmt.Println("Decryption error:", err)
 		return
 	}
 
-	err = pgp.DecryptWithPassphrase("private.pgp", "tungngern1234", "encrypted/006_Merchant_Report_20250429_1.txt.zip.pgp", "006_Merchant_Report_20250429_1.txt.zip")
+	err = pgp.DecryptWithPassphrase("private.pgp", "test", "encrypted/test.txt.zip.pgp", "test.txt.zip")
 	if err != nil {
 		fmt.Println("Decryption error:", err)
 		return
 	}
 
-	err = pgp.DecryptWithKeyRing("secret.asc", "encrypted/data_casa_dga_to_fi_006_25680424_1.csv.gpg", "data_casa_dga_to_fi_006_25680424_1.csv")
+	err = pgp.DecryptWithKeyRing("secret.asc", "encrypted/test.csv.gpg", "test.csv")
 	if err != nil {
 		fmt.Println("Decryption error:", err)
 		return
