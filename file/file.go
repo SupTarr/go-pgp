@@ -126,13 +126,14 @@ func WriteEncryptedZip(outputDir string, zipFileName string, filesToZip []string
 	defer zipWriter.Close()
 	for _, fileName := range filesToZip {
 		filePath := filepath.Join(outputDir, fileName)
-		fileToZip, _ := os.Open(filePath)
-		w, err := zipWriter.Encrypt(filepath.Join(zipDirName, fileName), password)
+		fileHeaderPath := filepath.Join(zipDirName, fileName)
+		zippedFile, _ := os.Open(filePath)
+		w, err := zipWriter.Encrypt(fileHeaderPath, password)
 		if err != nil {
 			return fmt.Errorf("failed to create encrypted entry for %s: %w", filePath, err)
 		}
 
-		if _, err = io.Copy(w, fileToZip); err != nil {
+		if _, err = io.Copy(w, zippedFile); err != nil {
 			return fmt.Errorf("failed to copy file %s to zip: %w", zipFilePath, err)
 		}
 	}
