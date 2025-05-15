@@ -7,4 +7,6 @@ private.txt
 public.asc
 private.asc
 casa
+casa-perf
+casa-result-perf
 mock.go
