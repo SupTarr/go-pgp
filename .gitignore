@@ -4,5 +4,7 @@ decrypted
 encrypted
 mock
 private.txt
-secret.asc
+public.asc
+private.asc
+casa
 mock.go

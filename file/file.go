@@ -1,12 +1,13 @@
 package file
 
 import (
-	"archive/zip"
 	"encoding/csv"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/alexmullins/zip"
 )
 
 func WriteTxt(outputDir, fileName string, content []byte) error {
@@ -51,43 +52,53 @@ func WriteCsv(outputDir, fileName string, data [][]string) error {
 	return nil
 }
 
-func WriteZip(outputDir, zipFileName string, filesToZip []string) error {
+func WriteZip(outputDir, zipFileName string, filesToZip []string, password string) error {
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		return fmt.Errorf("failed to create directory %s: %w", outputDir, err)
 	}
 
 	zipFilePath := filepath.Join(outputDir, zipFileName)
-
 	newZipFile, err := os.Create(zipFilePath)
 	if err != nil {
 		return fmt.Errorf("failed to create zip file %s: %w", zipFilePath, err)
 	}
-	defer newZipFile.Close()
 
+	defer newZipFile.Close()
 	zipWriter := zip.NewWriter(newZipFile)
 	defer zipWriter.Close()
-
 	for _, filePath := range filesToZip {
 		fileToZip, err := os.Open(filePath)
 		if err != nil {
 			return fmt.Errorf("failed to open file %s for zipping: %w", filePath, err)
 		}
+
 		defer fileToZip.Close()
+		var writerInZip io.Writer
+		var errCreateEntry error
+		fileNameInZip := filepath.Base(filePath)
+		if password != "" {
+			writerInZip, errCreateEntry = zipWriter.Encrypt(fileNameInZip, password)
+			if errCreateEntry != nil {
+				return fmt.Errorf("failed to create encrypted entry in zip for %s: %w", fileNameInZip, errCreateEntry)
+			}
+		} else {
+			info, errStat := fileToZip.Stat()
+			if errStat != nil {
+				return fmt.Errorf("failed to get file info for %s: %w", filePath, errStat)
+			}
 
-		info, err := fileToZip.Stat()
-		if err != nil {
-			return fmt.Errorf("failed to get file info for %s: %w", filePath, err)
-		}
+			header, errHeader := zip.FileInfoHeader(info)
+			if errHeader != nil {
+				return fmt.Errorf("failed to create zip header for %s: %w", filePath, errHeader)
+			}
 
-		header, err := zip.FileInfoHeader(info)
-		if err != nil {
-			return fmt.Errorf("failed to create zip header for %s: %w", filePath, err)
-		}
+			header.Name = fileNameInZip
+			header.Method = zip.Deflate
 
-		header.Name = filepath.Base(filePath)
-		writerInZip, err := zipWriter.CreateHeader(header)
-		if err != nil {
-			return fmt.Errorf("failed to create entry in zip for %s: %w", filePath, err)
+			writerInZip, errCreateEntry = zipWriter.CreateHeader(header)
+			if errCreateEntry != nil {
+				return fmt.Errorf("failed to create entry in zip for %s: %w", fileNameInZip, errCreateEntry)
+			}
 		}
 
 		if _, err = io.Copy(writerInZip, fileToZip); err != nil {
